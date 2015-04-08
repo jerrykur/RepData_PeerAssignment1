@@ -5,8 +5,6 @@ output:
     keep_md: true
 ---
 
-
-
 The following dependencies exist for this report.
 ```{r dependencies, echo=TRUE, warning=FALSE, message=FALSE }
 library(data.table)
@@ -14,6 +12,7 @@ library(printr)
 library(lubridate)
 library(lattice)
 ```
+
 ## Loading and preprocessing the data
 
 Read the data in from the files and save it into a data.table

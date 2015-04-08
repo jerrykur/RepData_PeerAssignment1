@@ -1,7 +1,5 @@
 # Reproducible Research: Peer Assessment 1
 
-
-
 The following dependencies exist for this report.
 
 ```r
@@ -10,6 +8,7 @@ library(printr)
 library(lubridate)
 library(lattice)
 ```
+
 ## Loading and preprocessing the data
 
 Read the data in from the files and save it into a data.table
