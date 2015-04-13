@@ -1,8 +1,9 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
+title: 'Reproducible Research: Peer Assessment 1'
+output:
+  pdf_document: default
   html_document:
-    keep_md: true
+    keep_md: yes
 ---
 
 The following dependencies exist for this report.
@@ -28,7 +29,8 @@ activity.dt <- data.table(activity)
 # remove the na lines
 activity.dt.noNA <- na.omit(activity.dt)
 # sum steps by date
-activity.dt.steps.by.day <- activity.dt.noNA[,list(steps.total=sum(steps)),by=date]
+activity.dt.steps.by.day <- activity.dt.noNA[,list(steps.total=sum(steps)), 
+                                             by=date]
 ```
 Total steps by date:
 `r activity.dt.steps.by.day`
@@ -42,7 +44,8 @@ Total steps by date:
 
 3. Calculate the mean and the median of the total number of steps per day
 ```{r calc-step-stats}
-step.stats<-activity.dt.steps.by.day[,list(total.mean=mean(steps.total),total.median=median(steps.total))]
+step.stats<-activity.dt.steps.by.day[,list(total.mean=mean(steps.total),
+                                           total.median=median(steps.total))]
 ```
 Step stats - mean: `r format(round(step.stats$total.mean, 3), nsmall=2)`,   median: `r step.stats$total.median`
 
@@ -57,9 +60,12 @@ intToHHMM <- function (i) {  sprintf("%02d:%02d", i %/% 100, i %% 100)}
 # calculate the mean steps for each time interval
 activity.dt.steps.by.interval.mean <- activity.dt.noNA[,list(steps.mean=mean(steps)),by=interval]
 # add the column "interval.HHMM" which displays the interval as a string in the format HH:MM
-activity.plot <- activity.dt.steps.by.interval.mean[, c("interval.HHMM") :=intToHHMM(interval), key="interval"]
+activity.plot <- activity.dt.steps.by.interval.mean[, 
+                      c("interval.HHMM") :=intToHHMM(interval), key="interval"]
 # generate the plot
-plot(strptime(activity.plot[, interval.HHMM], format="%H:%M"), activity.plot[, steps.mean],type="l", xlab="Time of Day (HH:MM)", ylab="Number of steps (Mean)", main="Average Activity by Time")
+plot(strptime(activity.plot[, interval.HHMM], format="%H:%M"), 
+     activity.plot[, steps.mean],type="l", xlab="Time of Day (HH:MM)", 
+     ylab="Number of steps (Mean)", main="Average Activity by Time")
 ```
 
 
@@ -90,9 +96,13 @@ There were `r numMissing` rows with missing values
 #   Create a copy of dt with NAs (this is ineffiecient, but I do not want to lose things while experimenting)
 activity.dt.filled <- activity.dt
 #   Get medians for each interval
-activity.dt.steps.by.interval.median <- activity.dt.noNA[,list(steps.median=median(steps)),by=interval]
+activity.dt.steps.by.interval.median <- activity.dt.noNA[,
+              list(steps.median=median(steps)),by=interval]
 #   replace steps with NA with the median.  This would be more efficent with get() calls.
-activity.dt.filled$steps <- ifelse(is.na(activity.dt.filled$steps), activity.dt.steps.by.interval.median$steps.median[match(activity.dt.filled$interval,activity.dt.steps.by.interval.median$interval)], activity.dt.filled$steps)
+activity.dt.filled$steps <- ifelse(is.na(activity.dt.filled$steps), 
+      activity.dt.steps.by.interval.median$steps.median[
+      match(activity.dt.filled$interval,activity.dt.steps.by.interval.median$interval)], 
+      activity.dt.filled$steps)
 
 ```
 
@@ -100,24 +110,29 @@ activity.dt.filled$steps <- ifelse(is.na(activity.dt.filled$steps), activity.dt.
 
 ```{r }
 # sum filled steps by date
-activity.dt.filled.steps.by.day <- activity.dt.filled[,list(steps.filled.total=sum(steps)),by=date]
+activity.dt.filled.steps.by.day <- activity.dt.filled[,
+                list(steps.filled.total=sum(steps)), by=date]
 # create comparison of daily steps without NAs and with NAs imputed
-activity.dt.compare <- merge (activity.dt.steps.by.day, activity.dt.filled.steps.by.day, by='date',all=TRUE)
+activity.dt.compare <- merge (activity.dt.steps.by.day, 
+                              activity.dt.filled.steps.by.day, by='date', 
+                              all=TRUE)
 ```
 * Compare the total steps by date without NAs and with NAs filled:
 `r activity.dt.compare`
 
-**  As the table shows the effect is to fill in the and thus add low # of step rows to the data set.
+As the table shows the effect is to fill in the and thus add low # of step rows to the data set.
 
 * Histogram of step by day
 
 ```{r, echo=FALSE}
 # to do replace with a melt and ggplot2
   hist.noNA <- hist(activity.dt.steps.by.day$steps.total, plot=FALSE)
-  hist.data.filled = hist(activity.dt.filled.steps.by.day$steps.filled.total, plot=FALSE)
+  hist.data.filled = hist(activity.dt.filled.steps.by.day$steps.filled.total, 
+                          plot=FALSE)
   # deterine ranges
   #xlim <- range(activity.dt.steps.by.day$date, activity.dt.filled.steps.by.day$date)
-  ylim <- range(0, activity.dt.steps.by.day$steps.total, activity.dt.filled.steps.by.day$steps.filled.total )
+  ylim <- range(0, activity.dt.steps.by.day$steps.total, 
+                activity.dt.filled.steps.by.day$steps.filled.total )
   # plot 1st graph2
   plot(hist.noNA, 
      col = rgb(1,0,0,0.4),xlab = 'Steps per day',
@@ -134,17 +149,19 @@ activity.dt.compare <- merge (activity.dt.steps.by.day, activity.dt.filled.steps
   par(opar)
 ```
 
-  **  The histogram shows how the low step values have been shifted.
+The histogram shows how the low step values have been shifted.
 
 
 * Calculate the mean and the median of the total number of steps per day
 ```{r calc-step-stats-filled}
-step.filled.stats<-activity.dt.filled.steps.by.day[,list(total.mean=mean(steps.filled.total),total.median=median(steps.filled.total))]
+step.filled.stats<-activity.dt.filled.steps.by.day[,
+            list(total.mean=mean(steps.filled.total),
+            total.median=median(steps.filled.total))]
 ```
 Step stats (with NAs) - mean: `r format(round(step.stats$total.mean, 3), nsmall=2)`,   median: `r step.stats$total.median`
 Step stats (without NAs) - mean: `r format(round(step.filled.stats$total.mean, 3), nsmall=2)`,   median: `r step.filled.stats$total.median`
 
-  **  The step stats (mean and median) show a downward shift in resulting from weighting the data at the low end of the step count.
+The step stats (mean and median) show a downward shift in resulting from weighting the data at the low end of the step count.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -155,7 +172,9 @@ Step stats (without NAs) - mean: `r format(round(step.filled.stats$total.mean, 3
 #   create new data.table, activity.dt.filled.DoW
 activity.dt.filled.DoW <- activity.dt.filled
 #   Add a column for the type of day ("Weekend", "Weekday")
-activity.dt.filled.DoW$typeOfDay <- ifelse(wday(as.Date(activity.dt.filled$date)) ==1 | wday(as.Date(activity.dt.filled$date)) ==7  , "Weekend", "Weekday")
+activity.dt.filled.DoW$typeOfDay <- 
+  ifelse(wday(as.Date(activity.dt.filled$date)) ==1 | wday(as.Date(activity.dt.filled$date)) ==7,
+         "Weekend", "Weekday")
 #   Make the column a factor
 activity.dt.filled.DoW$typeOfDay <- as.factor(activity.dt.filled.DoW$typeOfDay)
 ```
@@ -164,7 +183,8 @@ activity.dt.filled.DoW$typeOfDay <- as.factor(activity.dt.filled.DoW$typeOfDay)
 
 ```{r }
 # calculate the mean steps for each time interval
-activity.plot.DoW <- activity.dt.filled.DoW[,list(steps.mean=mean(steps)),by=c('interval', 'typeOfDay')]
+activity.plot.DoW <- activity.dt.filled.DoW[,list(steps.mean=mean(steps)), 
+                                            by=c('interval', 'typeOfDay')]
 #activity.dt.filled.DoW.steps.by.interval.mean
 # add the column "interval.HHMM" which displays the interval as a string in the format HH:MM
 activity.plot.DoW <- activity.plot.DoW[, c("interval.HHMM") :=intToHHMM(interval), key="interval"]
@@ -175,14 +195,20 @@ steps.mean.max <- max(activity.plot.DoW$steps.mean)
 par(mfrow=c(2,1))
 #    plot the Weekday
 activity.plot.DoW.Weekday <- activity.plot.DoW[typeOfDay == "Weekday",]
-plot(strptime(activity.plot.DoW.Weekday[, interval.HHMM], format="%H:%M"), activity.plot.DoW.Weekday[, steps.mean],type="l", xlab="Time of Day (HH:MM)", ylab="Number of steps (Mean)", ylim=c(0, steps.mean.max), main="Weekday Average Activity by Time")
+plot(strptime(activity.plot.DoW.Weekday[, interval.HHMM], format="%H:%M"), 
+     activity.plot.DoW.Weekday[, steps.mean],type="l", 
+     xlab="Time of Day (HH:MM)", ylab="Number of steps (Mean)", 
+     ylim=c(0, steps.mean.max), main="Weekday Average Activity by Time")
 #    plot the Weekend
 activity.plot.DoW.Weekend <- activity.plot.DoW[typeOfDay == "Weekend",]
-plot(strptime(activity.plot.DoW.Weekend[, interval.HHMM], format="%H:%M"), activity.plot.DoW.Weekend[, steps.mean],type="l", xlab="Time of Day (HH:MM)", ylab="Number of steps (Mean)", ylim=c(0, steps.mean.max), main="Weekend Average Activity by Time")
+plot(strptime(activity.plot.DoW.Weekend[, interval.HHMM], format="%H:%M"), 
+     activity.plot.DoW.Weekend[, steps.mean],type="l", xlab="Time of Day (HH:MM)", 
+     ylab="Number of steps (Mean)", ylim=c(0, steps.mean.max), 
+     main="Weekend Average Activity by Time")
 
 ```
 
-** The plots show that there is higher peek activity during weekdays and activity starts to build earlier.  On the weekend the 
+The plots show that there is higher peek activity during weekdays and activity starts to build earlier.  On the weekend the 
 activity starts later, but is higher throughout the middle of the day and continues later into the evening.   This is 
 likely reflects that during weekdays people go to work in the morning and settle in for the day.  On weekends they get up later but
 are active throughout the day and stay active later. 
